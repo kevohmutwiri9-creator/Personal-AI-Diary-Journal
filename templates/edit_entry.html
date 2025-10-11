@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Entry - My Diary{% endblock %}
+
+{% block content %}
+<div class="entry-form">
+    <h1><i class="fas fa-edit"></i> Edit Entry</h1>
+    <p class="entry-date">
+        <i class="fas fa-calendar"></i> 
+        {{ entry.timestamp.strftime('%B %d, %Y at %I:%M %p') if entry.timestamp else 'No date available' }}
+    
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="form-group">
+            <label for="content" class="form-label">Entry Content</label>
+
+            <!-- Rich Text Editor Toolbar -->
+            <div class="editor-toolbar">
+                <button type="button" onclick="formatText('bold')" class="toolbar-btn" title="Bold">
+                    <i class="fas fa-bold"></i>
+                </button>
+                <button type="button" onclick="formatText('italic')" class="toolbar-btn" title="Italic">
+                    <i class="fas fa-italic"></i>
+                </button>
+                <button type="button" onclick="formatText('underline')" class="toolbar-btn" title="Underline">
+                    <i class="fas fa-underline"></i>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button type="button" onclick="formatText('insertUnorderedList')" class="toolbar-btn" title="Bullet List">
+                    <i class="fas fa-list-ul"></i>
+                </button>
+                <button type="button" onclick="formatText('insertOrderedList')" class="toolbar-btn" title="Numbered List">
+                    <i class="fas fa-list-ol"></i>
+                </button>
+            </div>
+
+            <div
+                id="content-editor"
+                class="rich-editor"
+                contenteditable="true"
+            >{{ entry.content }}</div>
+            <input type="hidden" id="content" name="content" value="{{ entry.content }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">
+                <i class="fas fa-save"></i> Update Entry
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .entry-form {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .entry-form h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .dark-mode .entry-form h1 {
+        color: #ecf0f1;
+    }
+
+    .entry-date {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-style: italic;
+    }
+
+    .dark-mode .entry-date {
+        color: #bdc3c7;
+    }
+
+    /* Rich Text Editor Styles */
+    .editor-toolbar {
+        display: flex;
+        gap: 5px;
+        padding: 10px;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .dark-mode .editor-toolbar {
+        background: rgba(52, 152, 219, 0.1);
+    }
+
+    .toolbar-btn {
+        background: none;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 5px;
+        padding: 8px 10px;
+        color: #667eea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .toolbar-btn:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .dark-mode .toolbar-btn {
+        border-color: rgba(52, 152, 219, 0.3);
+        color: #3498db;
+    }
+
+    .dark-mode .toolbar-btn:hover {
+        background: #3498db;
+        color: white;
+    }
+
+    .toolbar-separator {
+        width: 1px;
+        background: rgba(102, 126, 234, 0.3);
+        margin: 0 5px;
+    }
+
+    .dark-mode .toolbar-separator {
+        background: rgba(52, 152, 219, 0.3);
+    }
+
+    .rich-editor {
+        min-height: 300px;
+        padding: 15px;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 8px;
+        background: white;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        line-height: 1.6;
+        outline: none;
+        overflow-y: auto;
+    }
+
+    .rich-editor:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .dark-mode .rich-editor {
+        background: #2c3e50;
+        color: #ecf0f1;
+        border-color: rgba(52, 152, 219, 0.3);
+    }
+
+    .dark-mode .rich-editor:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editor = document.getElementById('content-editor');
+        const hiddenInput = document.getElementById('content');
+
+        // Update hidden input when editor changes
+        editor.addEventListener('input', function() {
+            hiddenInput.value = editor.innerHTML;
+        });
+
+        // Initial sync
+        hiddenInput.value = editor.innerHTML;
+    });
+
+    // Rich text editor functions
+    function formatText(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('content-editor').focus();
+    }
+</script>
+{% endblock %}
+
+

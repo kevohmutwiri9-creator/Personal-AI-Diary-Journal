@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Categories - My Diary{% endblock %}
+
+{% block content %}
+<div class="categories-page">
+    <h1><i class="fas fa-tags"></i> Manage Categories</h1>
+    <p class="page-subtitle">Organize your entries with custom categories</p>
+    
+    <div class="create-category">
+        <h2><i class="fas fa-plus"></i> Create New Category</h2>
+        <form method="POST" action="{{ url_for('create_category') }}" class="category-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name" class="form-label">Category Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="form-input" 
+                        placeholder="Enter category name..."
+                        required
+                        maxlength="50"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="color" class="form-label">Color</label>
+                    <input 
+                        type="color" 
+                        id="color" 
+                        name="color" 
+                        class="form-input color-picker" 
+                        value="#667eea"
+                    >
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">
+                <i class="fas fa-plus"></i> Create Category
+            </button>
+        </form>
+    </div>
+    
+    <div class="categories-list">
+        <h2><i class="fas fa-list"></i> Your Categories</h2>
+        
+        {% if categories %}
+            <div class="categories-grid">
+                {% for category in categories %}
+                    <div class="category-card" style="border-left: 4px solid {{ category.color }};">
+                        <div class="category-header">
+                            <h3 style="color: {{ category.color }};">{{ category.name }}</h3>
+                            <span class="category-count">{{ category.entries|length }} entries</span>
+                        </div>
+                        
+                        <div class="category-actions">
+                            <button class="btn btn-small" onclick="editCategory({{ category.id }}, '{{ category.name }}', '{{ category.color }}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="deleteCategory({{ category.id }}, '{{ category.name }}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-categories">
+                <i class="fas fa-tags"></i>
+                <h3>No categories yet</h3>
+                <p>Create your first category to start organizing your entries!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="back-to-dashboard">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    .categories-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .categories-page h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .dark-mode .categories-page h1 {
+        color: #ecf0f1;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 40px;
+        font-style: italic;
+    }
+
+    .dark-mode .page-subtitle {
+        color: #bdc3c7;
+    }
+
+    .create-category {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .create-category {
+        background: rgba(44, 62, 80, 0.5);
+    }
+
+    .create-category h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .dark-mode .create-category h2 {
+        color: #ecf0f1;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        margin-bottom: 20px;
+        align-items: end;
+    }
+
+    .color-picker {
+        width: 60px;
+        height: 40px;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .categories-list h2 {
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .dark-mode .categories-list h2 {
+        color: #ecf0f1;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .category-card {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .dark-mode .category-card {
+        background: rgba(44, 62, 80, 0.7);
+    }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .category-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .category-count {
+        background: rgba(0, 0, 0, 0.1);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .dark-mode .category-count {
+        background: rgba(255, 255, 255, 0.1);
+        color: #bdc3c7;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .no-categories {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .dark-mode .no-categories {
+        color: #bdc3c7;
+    }
+
+    .no-categories i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #ccc;
+    }
+
+    .no-categories h3 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .dark-mode .no-categories h3 {
+        color: #ecf0f1;
+    }
+
+    .back-to-dashboard {
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .category-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .category-actions {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    function editCategory(id, name, color) {
+        const newName = prompt('Enter new category name:', name);
+        if (newName && newName !== name) {
+            // TODO: Implement edit functionality
+            alert('Edit functionality coming soon!');
+        }
+    }
+
+    function deleteCategory(id, name) {
+        if (confirm(`Are you sure you want to delete the category "${name}"? This action cannot be undone.`)) {
+            // TODO: Implement delete functionality
+            alert('Delete functionality coming soon!');
+        }
+    }
+</script>
+{% endblock %}
+

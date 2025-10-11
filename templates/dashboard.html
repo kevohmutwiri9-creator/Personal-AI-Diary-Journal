@@ -1,0 +1,939 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - My Diary{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="welcome-section">
+        <h1><i class="fas fa-home"></i> Welcome back, {{ current_user.username }}!</h1>
+        <p class="welcome-subtitle">Here are your recent diary entries</p>
+
+        {% set streak_info = current_user.get_streak_info() %}
+        <div class="streak-banner {{ streak_info.status }}">
+            <div class="streak-icon">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="streak-content">
+                <div class="streak-count">{{ streak_info.current }} day streak</div>
+                <div class="streak-message">{{ streak_info.message }}</div>
+            </div>
+            {% if streak_info.longest and streak_info.longest > 0 %}
+                <div class="streak-badge">
+                    <i class="fas fa-trophy"></i>
+                    Best: {{ streak_info.longest }} days
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Statistics Overview Cards -->
+    <div class="stats-overview">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" data-target="{{ entries|length }}">0</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" data-target="{{ entries|sum(attribute='word_count') if entries else 0 }}">0</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" data-target="{{ streak_info.current if streak_info.current else 0 }}">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" data-target="{{ streak_info.longest if streak_info.longest else 0 }}">0</div>
+                    <div class="stat-label">Best Streak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{{ url_for('write') }}" class="btn">
+            <i class="fas fa-pen"></i> Write New Entry
+        </a>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Search Entries
+        </a>
+    </div>
+
+    {% if entries %}
+        <div class="entries-section">
+            <h2><i class="fas fa-book"></i> Your Entries</h2>
+
+            <div class="entries-grid">
+                {% for entry in entries %}
+                    <div class="entry-card {% if entry.is_favorite %}favorite-entry{% endif %}" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                        <div class="entry-header">
+                            <div class="entry-date-time">
+                                <span class="entry-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ entry.timestamp.strftime('%B %d, %Y') if entry.timestamp else 'No date' }}
+                                </span>
+                                <span class="entry-time">
+                                    <i class="fas fa-clock"></i>
+                                    {{ entry.timestamp.strftime('%I:%M %p') if entry.timestamp else '' }}
+                                </span>
+                            </div>
+                            <button class="favorite-btn" onclick="toggleFavorite({{ entry.id }}, this)" title="{% if entry.is_favorite %}Unpin{% else %}Pin{% endif %} entry" aria-label="{% if entry.is_favorite %}Unpin{% else %}Pin{% endif %} entry">
+                                <i class="{% if entry.is_favorite %}fas{% else %}far{% endif %} fa-star"></i>
+                            </button>
+                        </div>
+
+                        <div class="entry-preview">
+                            {{ entry.content[:150] }}{% if entry.content|length > 150 %}...{% endif %}
+                        </div>
+
+                        <div class="entry-actions">
+                            <a href="{{ url_for('view_entry', entry_id=entry.id) }}" class="btn btn-small">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="btn btn-small">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if pagination.pages > 1 %}
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                        <a href="{{ url_for('dashboard', page=pagination.prev_num) }}" class="btn btn-small">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="page-info">
+                        Page {{ pagination.page }} of {{ pagination.pages }}
+                    </span>
+
+                    {% if pagination.has_next %}
+                        <a href="{{ url_for('dashboard', page=pagination.next_num) }}" class="btn btn-small">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="no-entries">
+            <i class="fas fa-book-open"></i>
+            <h3>No entries yet</h3>
+            <p>Start your diary journey by writing your first entry!</p>
+            <a href="{{ url_for('write') }}" class="btn">
+                <i class="fas fa-pen"></i> Write Your First Entry
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* Enhanced Welcome Section */
+.welcome-section {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.6; transform: translateX(-50%) scale(1.2); }
+}
+
+.welcome-section h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+.dark-mode .welcome-section h1 {
+    color: #ecf0f1;
+}
+
+.welcome-subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.dark-mode .welcome-subtitle {
+    color: #bdc3c7;
+}
+
+/* Enhanced Statistics Overview */
+.stats-overview {
+    margin-bottom: 50px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.dark-mode .stat-card {
+    background: rgba(44, 62, 80, 0.9);
+    border-color: rgba(52, 152, 219, 0.3);
+}
+
+.dark-mode .stat-card::before {
+    background: linear-gradient(90deg, #3498db, #9b59b6);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.dark-mode .stat-number {
+    color: #ecf0f1;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dark-mode .stat-label {
+    color: #bdc3c7;
+}
+
+/* Enhanced Streak Banner */
+.streak-banner {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 30px 35px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    border-radius: 25px;
+    margin: 30px 0;
+    color: white;
+    box-shadow: 0 10px 40px rgba(255, 107, 107, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.streak-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+    animation: shimmer 3s infinite;
+}
+
+.streak-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(255, 107, 107, 0.4);
+}
+
+.streak-banner.no_entries {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.streak-banner.can_extend {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.streak-banner.active_today {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.streak-banner.broken {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.streak-icon {
+    font-size: 3.5rem;
+    opacity: 0.9;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+    animation: float 2s ease-in-out infinite;
+    z-index: 2;
+    position: relative;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+.streak-content {
+    flex: 1;
+    z-index: 2;
+    position: relative;
+}
+
+.streak-count {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.streak-message {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    line-height: 1.4;
+}
+
+.streak-badge {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.streak-badge:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05);
+}
+
+/* Enhanced Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+}
+
+/* Enhanced Entries Section */
+.entries-section h2 {
+    margin-bottom: 40px;
+    color: #333;
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    position: relative;
+}
+
+.dark-mode .entries-section h2 {
+    color: #ecf0f1;
+}
+
+.entries-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    animation: underlineGrow 0.8s ease-out;
+}
+
+@keyframes underlineGrow {
+    from { width: 0; }
+    to { width: 80px; }
+}
+
+.dark-mode .entries-section h2::after {
+    background: linear-gradient(90deg, #3498db, #9b59b6);
+}
+
+/* Enhanced Entry Cards */
+.entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 35px;
+    margin-bottom: 60px;
+}
+
+.entry-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 25px;
+    padding: 35px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: height 0.3s ease;
+}
+
+.entry-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.entry-card:hover::before {
+    height: 8px;
+}
+
+.dark-mode .entry-card {
+    background: rgba(44, 62, 80, 0.9);
+    border-color: rgba(52, 152, 219, 0.3);
+}
+
+.dark-mode .entry-card::before {
+    background: linear-gradient(90deg, #3498db, #9b59b6);
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .entry-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.entry-date-time {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.entry-date, .entry-time {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.entry-date:hover, .entry-time:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateX(5px);
+}
+
+.dark-mode .entry-date, .dark-mode .entry-time {
+    color: #bdc3c7;
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.dark-mode .entry-date:hover, .dark-mode .entry-time:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #f39c12;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 10px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.3) rotate(15deg);
+    background: rgba(243, 156, 18, 0.1);
+}
+
+.favorite-btn .fa-star {
+    color: #f39c12;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    transition: all 0.3s ease;
+}
+
+.favorite-btn:hover .fa-star {
+    color: #e67e22;
+    filter: drop-shadow(0 3px 6px rgba(243, 156, 18, 0.4));
+}
+
+.favorite-entry {
+    border: 2px solid #f39c12;
+    box-shadow: 0 10px 40px rgba(243, 156, 18, 0.2);
+}
+
+.favorite-entry::before {
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+    height: 8px;
+}
+
+.dark-mode .favorite-entry {
+    border-color: #f39c12;
+    box-shadow: 0 10px 40px rgba(243, 156, 18, 0.3);
+}
+
+.entry-preview {
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 30px;
+    min-height: 80px;
+    font-size: 1.05rem;
+    position: relative;
+}
+
+.entry-preview::first-letter {
+    float: left;
+    font-size: 3rem;
+    line-height: 2rem;
+    margin-right: 10px;
+    margin-top: 5px;
+    color: #667eea;
+    font-weight: 700;
+}
+
+.dark-mode .entry-preview {
+    color: #ecf0f1;
+}
+
+.entry-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Enhanced Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 60px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.dark-mode .pagination {
+    background: rgba(44, 62, 80, 0.5);
+}
+
+.page-info {
+    color: #666;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.dark-mode .page-info {
+    color: #bdc3c7;
+    background: rgba(52, 152, 219, 0.1);
+    border-color: rgba(52, 152, 219, 0.2);
+}
+
+/* Enhanced No Entries State */
+.no-entries {
+    text-align: center;
+    padding: 120px 40px;
+    color: #666;
+    position: relative;
+}
+
+.no-entries::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.no-entries i {
+    font-size: 6rem;
+    margin-bottom: 30px;
+    color: rgba(102, 126, 234, 0.3);
+    animation: float-icon 3s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes float-icon {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.no-entries h3 {
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+.dark-mode .no-entries {
+    color: #bdc3c7;
+}
+
+.dark-mode .no-entries h3 {
+    color: #ecf0f1;
+}
+
+.no-entries p {
+    margin-bottom: 40px;
+    font-size: 1.3rem;
+    opacity: 0.8;
+    position: relative;
+    z-index: 2;
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+    .entries-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .entry-header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .quick-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .streak-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+        padding: 30px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        padding: 25px 20px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard {
+        padding: 15px 0;
+    }
+
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+
+    .entries-grid {
+        gap: 25px;
+    }
+
+    .entry-card {
+        padding: 25px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 20px 15px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .no-entries {
+        padding: 80px 20px;
+    }
+
+    .no-entries i {
+        font-size: 4rem;
+    }
+
+    .no-entries h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+    .entry-card, .stat-card, .streak-banner, .floating-bot-icon {
+        transition: none;
+        animation: none;
+    }
+
+    .entry-card:hover, .stat-card:hover {
+        transform: none;
+    }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .entry-card, .stat-card, .streak-banner {
+        border-width: 2px;
+    }
+
+    .nav a, .btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Print styles */
+@media print {
+    .stats-overview, .quick-actions, .pagination {
+        display: none;
+    }
+
+    .entry-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animate statistics counters on scroll
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const increment = target / 100;
+        let current = 0;
+
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.ceil(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+
+        // Start animation when element is in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateCounter();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        observer.observe(counter);
+    });
+}
+
+// Initialize animations when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    animateCounters();
+});
+
+function toggleFavorite(entryId, button) {
+    const icon = button.querySelector('i');
+    const card = button.closest('.entry-card');
+
+    // Get CSRF token from meta tag or form
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                  document.querySelector('input[name="csrf_token"]')?.value;
+
+    fetch(`/toggle_favorite/${entryId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'X-CSRFToken': token })
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Toggle star icon with animation
+            if (data.is_favorite) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                card.classList.add('favorite-entry');
+                button.title = 'Unpin entry';
+
+                // Add celebration animation
+                card.style.animation = 'celebrate 0.6s ease-out';
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                card.classList.remove('favorite-entry');
+                button.title = 'Pin entry';
+            }
+
+            // Show success message (optional)
+            console.log(data.message);
+        } else {
+            alert(data.message || 'Failed to update favorite status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+
+// Add celebration animation keyframes
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
