@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - My Diary{% endblock %}
+
+{% block content %}
+<div class="stats-page">
+    <h1><i class="fas fa-chart-bar"></i> Your Diary Statistics</h1>
+    <p class="page-subtitle">Insights into your writing journey</p>
+    
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.total_entries }}</h3>
+                <p>Total Entries</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-keyboard"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.total_words }}</h3>
+                <p>Total Words</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.avg_words }}</h3>
+                <p>Avg Words/Entry</p>
+            </div>
+        </div>
+    </div>
+    
+    {% if stats.mood_stats %}
+        <div class="stats-section">
+            <h2><i class="fas fa-smile"></i> Mood Distribution</h2>
+            <div class="mood-stats">
+                {% for mood, count in stats.mood_stats.items() %}
+                    <div class="mood-item">
+                        <span class="mood-emoji">{{ mood.split(' ')[0] }}</span>
+                        <span class="mood-name">{{ mood.split(' ', 1)[1] if ' ' in mood else mood }}</span>
+                        <span class="mood-count">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if stats.most_common_mood %}
+        <div class="stats-section">
+            <h2><i class="fas fa-star"></i> Mood Insights</h2>
+            <div class="mood-insights">
+                <div class="insight-item">
+                    <div class="insight-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>Your Most Common Mood</h4>
+                        <p class="insight-value">{{ stats.most_common_mood }}</p>
+                        <p class="insight-desc">This appears most frequently in your entries</p>
+                    </div>
+                </div>
+
+                {% if stats.mood_improvement is not none %}
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Mood Trend</h4>
+                            <p class="insight-value {% if stats.mood_improvement > 0 %}positive{% elif stats.mood_improvement < 0 %}negative{% else %}neutral{% endif %}">
+                                {% if stats.mood_improvement > 0 %}📈 Improving{% elif stats.mood_improvement < 0 %}📉 Declining{% else %}➡️ Stable{% endif %}
+                            </p>
+                            <p class="insight-desc">
+                                {% if stats.mood_improvement > 0 %}
+                                    Your mood has improved by {{ stats.mood_improvement }} positive entries compared to earlier entries
+                                {% elif stats.mood_improvement < 0 %}
+                                    Your mood has declined by {{ -stats.mood_improvement }} positive entries compared to earlier entries
+                                {% else %}
+                                    Your mood has remained stable over time
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if stats.mood_trends %}
+        <div class="stats-section">
+            <h2><i class="fas fa-chart-area"></i> Mood Trends (Last 30 Days)</h2>
+            <div class="mood-trends">
+                {% for day, moods in stats.mood_trends.items() %}
+                    <div class="trend-item">
+                        <span class="trend-date">{{ day }}</span>
+                        <div class="trend-moods">
+                            {% for mood in moods %}
+                                <span class="mood-badge">{{ mood.split(' ')[0] }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if stats.category_stats %}
+        <div class="stats-section">
+            <h2><i class="fas fa-tags"></i> Category Distribution</h2>
+            <div class="category-stats">
+                {% for category, count in stats.category_stats.items() %}
+                    <div class="category-item">
+                        <div class="category-bar">
+                            <div class="category-fill" style="width: {{ (count / stats.total_entries * 100) }}%;"></div>
+                        </div>
+                        <span class="category-name">{{ category }}</span>
+                        <span class="category-count">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if stats.tag_stats %}
+        <div class="stats-section">
+            <h2><i class="fas fa-hashtag"></i> Most Used Tags</h2>
+            <div class="tag-stats">
+                {% for tag, count in stats.tag_stats.items() %}
+                    <div class="tag-item">
+                        <span class="tag-name">#{{ tag }}</span>
+                        <span class="tag-count">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if stats.monthly_stats %}
+        <div class="stats-section">
+            <h2><i class="fas fa-calendar"></i> Writing Activity</h2>
+            <div class="monthly-stats">
+                {% for month, count in stats.monthly_stats.items() %}
+                    <div class="month-item">
+                        <span class="month-name">{{ month }}</span>
+                        <div class="month-bar">
+                            <div class="month-fill" style="width: {{ (count / stats.monthly_stats.values()|max * 100) }}%;"></div>
+                        </div>
+                        <span class="month-count">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="stats-actions">
+        <a href="{{ url_for('export_entries', format='json') }}" class="btn">
+            <i class="fas fa-download"></i> Export Data
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    .stats-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .stats-page h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .dark-mode .stats-page h1 {
+        color: #ecf0f1;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 40px;
+        font-style: italic;
+    }
+
+    .dark-mode .page-subtitle {
+        color: #bdc3c7;
+    }
+
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .dark-mode .stat-card {
+        background: rgba(44, 62, 80, 0.7);
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 15px;
+    }
+
+    .dark-mode .stat-icon {
+        color: #3498db;
+    }
+
+    .stat-content h3 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .dark-mode .stat-content h3 {
+        color: #ecf0f1;
+    }
+
+    .stat-content p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .dark-mode .stat-content p {
+        color: #bdc3c7;
+    }
+
+    .stats-section {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .stats-section {
+        background: rgba(44, 62, 80, 0.5);
+    }
+
+    .stats-section h2 {
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .dark-mode .stats-section h2 {
+        color: #ecf0f1;
+    }
+
+    .mood-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .mood-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+
+    .dark-mode .mood-item {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mood-emoji {
+        font-size: 1.5rem;
+    }
+
+    .mood-name {
+        flex: 1;
+        color: #333;
+    }
+
+    .dark-mode .mood-name {
+        color: #ecf0f1;
+    }
+
+    .mood-count {
+        background: #667eea;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+    }
+
+    .category-stats, .monthly-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .category-item, .month-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .category-bar, .month-bar {
+        flex: 1;
+        height: 20px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .dark-mode .category-bar, .dark-mode .month-bar {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .category-fill, .month-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+    }
+
+    .category-name, .month-name {
+        min-width: 100px;
+        color: #333;
+    }
+
+    .dark-mode .category-name, .dark-mode .month-name {
+        color: #ecf0f1;
+    }
+
+    .category-count, .month-count {
+        min-width: 30px;
+        text-align: right;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .dark-mode .category-count, .dark-mode .month-count {
+        color: #bdc3c7;
+    }
+
+    .tag-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tag-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 20px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .tag-name {
+        color: #667eea;
+        font-weight: 500;
+    }
+
+    .mood-insights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .insight-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dark-mode .insight-item {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .insight-icon {
+        font-size: 2.5rem;
+        color: #667eea;
+        min-width: 50px;
+        text-align: center;
+    }
+
+    .dark-mode .insight-icon {
+        color: #3498db;
+    }
+
+    .insight-content h4 {
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .dark-mode .insight-content h4 {
+        color: #ecf0f1;
+    }
+
+    .insight-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .dark-mode .insight-value {
+        color: #ecf0f1;
+    }
+
+    .insight-value.positive {
+        color: #27ae60;
+    }
+
+    .insight-value.negative {
+        color: #e74c3c;
+    }
+
+    .insight-value.neutral {
+        color: #95a5a6;
+    }
+
+    .insight-desc {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .dark-mode .insight-desc {
+        color: #bdc3c7;
+    }
+
+    .mood-trends {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .trend-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+
+    .dark-mode .trend-item {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .trend-date {
+        min-width: 100px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .dark-mode .trend-date {
+        color: #ecf0f1;
+    }
+
+    .trend-moods {
+        display: flex;
+        gap: 5px;
+        flex: 1;
+    }
+
+    .mood-badge {
+        padding: 2px 6px;
+        background: rgba(102, 126, 234, 0.2);
+        border-radius: 10px;
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+        .stats-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .mood-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .category-item, .month-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .category-bar, .month-bar {
+            width: 100%;
+        }
+
+        .stats-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+

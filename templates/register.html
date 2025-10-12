@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Register - My Diary{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <h1><i class="fas fa-user-plus"></i> Create Account</h1>
+        <p class="auth-subtitle">Start your diary journey today</p>
+        
+        <form method="POST" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input" 
+                    placeholder="Choose a username"
+                    required
+                    minlength="3"
+                    autocomplete="username"
+                >
+                <small class="form-help">3+ characters, letters, numbers, and underscores only</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Create a strong password"
+                    required
+                    minlength="8"
+                    autocomplete="new-password"
+                >
+                <small class="form-help">8+ characters with uppercase, lowercase, and numbers</small>
+            </div>
+            
+            <button type="submit" class="btn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account?</p>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+    }
+
+    .auth-container {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .dark-mode .auth-container {
+        background: rgba(44, 62, 80, 0.5);
+    }
+
+    .auth-container h1 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .dark-mode .auth-container h1 {
+        color: #ecf0f1;
+    }
+
+    .auth-subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-style: italic;
+    }
+
+    .dark-mode .auth-subtitle {
+        color: #bdc3c7;
+    }
+
+    .auth-form {
+        margin-bottom: 30px;
+    }
+
+    .form-help {
+        display: block;
+        margin-top: 5px;
+        color: #666;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .dark-mode .form-help {
+        color: #bdc3c7;
+    }
+
+    .auth-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 20px;
+    }
+
+    .dark-mode .auth-footer {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .auth-footer p {
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .dark-mode .auth-footer p {
+        color: #bdc3c7;
+    }
+
+    @media (max-width: 768px) {
+        .auth-container {
+            margin: 20px;
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %}

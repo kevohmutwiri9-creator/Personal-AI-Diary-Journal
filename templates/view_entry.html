@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}View Entry - My Diary{% endblock %}
+
+{% block content %}
+<div class="entry-view">
+    <div class="entry-header">
+        <h1><i class="fas fa-eye"></i> Diary Entry</h1>
+        <p class="entry-date">
+            <i class="fas fa-calendar"></i> 
+            {{ entry.timestamp.strftime('%B %d, %Y at %I:%M %p') if entry.timestamp else 'No date available' }}
+        </p>
+    </div>
+    
+    <div class="entry-content">
+        <div class="entry-text">
+            {{ entry.content|replace('\n', '<br>')|safe }}
+        </div>
+    </div>
+    
+    <div class="entry-actions">
+        <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="btn">
+            <i class="fas fa-edit"></i> Edit Entry
+        </a>
+        <button onclick="confirmDelete()" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Entry
+        </button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+        <p>Are you sure you want to delete this entry? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Yes, Delete
+                </button>
+            </form>
+            <button onclick="closeModal()" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .entry-view {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .entry-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .entry-header h1 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .dark-mode .entry-header h1 {
+        color: #ecf0f1;
+    }
+
+    .entry-date {
+        color: #666;
+        font-style: italic;
+        font-size: 1.1rem;
+    }
+
+    .dark-mode .entry-date {
+        color: #bdc3c7;
+    }
+
+    .entry-content {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .entry-content {
+        background: rgba(44, 62, 80, 0.5);
+    }
+
+    .entry-text {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .dark-mode .entry-text {
+        color: #ecf0f1;
+    }
+
+    .entry-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .dark-mode .modal-content {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+
+    .modal-content h3 {
+        margin-bottom: 15px;
+        color: #e74c3c;
+    }
+
+    .modal-content p {
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .entry-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-content {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .modal-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+    function confirmDelete() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}
+
+
