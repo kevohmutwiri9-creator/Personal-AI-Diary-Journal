@@ -15,7 +15,7 @@ import google.generativeai as genai
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
-import os\nimport json
+import os
 
 # Load .env file
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
