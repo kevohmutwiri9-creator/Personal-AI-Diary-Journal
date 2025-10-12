@@ -77,3 +77,5 @@
 2025-10-12 10:36:13,733 INFO: Login page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:414]
 2025-10-12 10:36:13,746 INFO: Login attempt for username: kevoh2 [in C:\Users\kevoh\Documents\My diary\app.py:418]
 2025-10-12 10:36:15,515 INFO: User logged in successfully: kevoh2 (ID: 1) [in C:\Users\kevoh\Documents\My diary\app.py:426]
+2025-10-12 11:56:20,244 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:64]
+2025-10-12 11:56:23,968 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:121]
