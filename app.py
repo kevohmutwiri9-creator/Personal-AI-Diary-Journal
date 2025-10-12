@@ -710,10 +710,6 @@ def create_template():
         flash('Template name and content are required', 'danger')
         return redirect(url_for('templates'))
     
-    if __name__ == '__main__':
-        app.run(debug=True)
-    direct(url_for('templates'))
-    
     # Process tags
     tags_list = []
     if tags_input:
@@ -1353,13 +1349,7 @@ def toggle_favorite(entry_id):
             'message': 'An error occurred. Please try again.'
         }), 500
 
-# Initialize database tables for production deployment
-with app.app_context():
-    try:
-        db.create_all()
-        print("Database tables created successfully for production")
-    except Exception as e:
-        print(f"Database initialization warning: {e}")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Ensure database tables are created before starting the app
     app.run(debug=True)
