@@ -7,8 +7,8 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timezone, timedelta
-import os\nimport json
-import re
+import os
+import json
 import logging
 from logging.handlers import RotatingFileHandler
 import google.generativeai as genai
