@@ -345,7 +345,7 @@ def home():
 
 # Register
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("3 per hour")
+@limiter.limit("10 per hour")
 def register():
     app.logger.info(f'Register page accessed - Method: {request.method}')
     
