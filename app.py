@@ -7,7 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timezone, timedelta
-import os\nimport re
+import os
 import json
 import logging
 from logging.handlers import RotatingFileHandler
@@ -15,7 +15,6 @@ import google.generativeai as genai
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
-import os\nimport re
 
 # Load .env file
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
