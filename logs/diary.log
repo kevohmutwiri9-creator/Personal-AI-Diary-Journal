@@ -81,3 +81,5 @@
 2025-10-12 11:56:23,968 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:121]
 2025-10-12 14:09:25,069 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:63]
 2025-10-12 14:09:31,434 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:120]
+2025-10-12 14:52:14,543 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:63]
+2025-10-12 14:52:19,390 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:120]
