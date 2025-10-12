@@ -1033,6 +1033,18 @@
         </header>
 
         <main class="main-content" id="main-content">
+            <!-- AdSense Sidebar Ad -->
+            <div style="margin-bottom: 30px; text-align: center;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-2396098605485959"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="flash-messages">
@@ -1106,3 +1118,4 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
