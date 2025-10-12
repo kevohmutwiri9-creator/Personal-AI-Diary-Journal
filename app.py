@@ -1360,4 +1360,4 @@ with app.app_context():
     except Exception as e:
         print(f'Database initialization warning: {e}')
 
-    app.run(debug=True)
+    # Production deployment configuration\n    port = int(os.environ.get("PORT", 5000))\n    app.run(host="0.0.0.0", port=port, debug=False)
