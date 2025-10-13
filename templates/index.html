@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}My Diary - AI-Powered Personal Journal for Self-Discovery{% endblock %}
+{% block title %}My Diary - Your Personal Journal{% endblock %}
 
 {% block content %}
 <div class="home-page">
@@ -8,7 +8,7 @@
     <div class="hero-section">
         <div class="hero-background">
             <!-- Background Image Integration -->
-            <div class="hero-bg-image"></div>
+            <div class="hero-bg-image" style="background-image: url(&quot;{{ url_for('static', filename='img/c.jpg') }}&quot;);"></div>
             <div class="hero-overlay"></div>
         </div>
 
@@ -181,7 +181,7 @@
     <!-- Testimonials Section -->
     <div class="testimonials-section">
         <div class="testimonials-background">
-            <div class="testimonials-bg-pattern"></div>
+            <div class="testimonials-bg-pattern" style="background-image: url(&quot;{{ url_for('static', filename='img/a.jpg') }}&quot;);"></div>
         </div>
 
         <h2>What Our Writers Say</h2>
@@ -268,7 +268,6 @@
         </div>
     {% endif %}
 </div>
-</div>
 {% endblock %}
 
 {% block extra_css %}
@@ -298,7 +297,6 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: url('{{ url_for('static', filename='img/c.jpg') }}');
         background-size: cover;
         background-position: center;
         opacity: 0.05;
@@ -476,7 +474,6 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: url('{{ url_for('static', filename='img/a.jpg') }}');
         background-size: 200px 200px;
         background-repeat: repeat;
         opacity: 0.02;
