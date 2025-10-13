@@ -409,7 +409,7 @@ def register():
 
 # Login
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("20 per minute")
 def login():
     app.logger.info(f'Login page accessed - Method: {request.method}')
     
