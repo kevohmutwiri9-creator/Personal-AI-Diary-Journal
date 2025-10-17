@@ -439,6 +439,18 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+# AdSense Verification Route
+@app.route('/googleytR3N45PwqlIrLfAySGxBq54hgHbj6GCP2Hp_SgoK6w.html')
+def adsense_verification():
+    """Serve AdSense verification file at root level"""
+    return send_from_directory('.', 'googleytR3N45PwqlIrLfAySGxBq54hgHbj6GCP2Hp_SgoK6w.html')
+
+# AdSense Ads.txt Route
+@app.route('/ads.txt')
+def adsense_ads_txt():
+    """Serve AdSense ads.txt file at root level"""
+    return send_from_directory('.', 'ads.txt')
+
 # Dashboard
 @app.route('/dashboard')
 @login_required
