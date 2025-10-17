@@ -1352,13 +1352,8 @@ def toggle_favorite(entry_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensure database tables are created before starting the app
-# Initialize database tables for production deployment
-with app.app_context():
-    try:
-        db.create_all()
-        print('Database tables created successfully for production')
-    except Exception as e:
-        print(f'Database initialization warning: {e}')
 
-    # Production deployment configuration\n    port = int(os.environ.get("PORT", 5000))\n    app.run(host="0.0.0.0", port=port, debug=False)
+    # Production deployment configuration
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
