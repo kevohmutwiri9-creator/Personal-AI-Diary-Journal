@@ -1519,7 +1519,22 @@ def toggle_favorite(entry_id):
             'message': 'An error occurred. Please try again.'
         }), 500
 
-# Initialize database tables for production deployment\nwith app.app_context():\n    try:\n        # Import and run migrations to ensure all columns exist\n        from flask_migrate import upgrade\n        upgrade()\n        print(\"Database migrations applied successfully\")\n    except Exception as e:\n        print(f\"Error running migrations: {str(e)}\")\n        # Fallback: try to create tables if migrations fail\n        try:\n            db.create_all()\n            print(\"Database tables created successfully\")\n        except Exception as e2:\n            print(f\"Error creating database tables: {str(e2)}\")\n            raise
+# Initialize database tables for production deployment
+with app.app_context():
+    try:
+        # Import and run migrations to ensure all columns exist
+        from flask_migrate import upgrade
+        upgrade()
+        print("Database migrations applied successfully")
+    except Exception as e:
+        print(f"Error running migrations: {str(e)}")
+        # Fallback: try to create tables if migrations fail
+        try:
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e2:
+            print(f"Error creating database tables: {str(e2)}")
+            raise
 
 if __name__ == '__main__':
     # Production deployment configuration
