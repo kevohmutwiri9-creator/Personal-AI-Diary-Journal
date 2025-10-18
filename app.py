@@ -1516,7 +1516,7 @@ def categories():
     return render_template('categories.html', categories=categories_with_counts)
 
 # Create Category
-@app.route('/categories/create', methods=['POST'])
+@app.route('/categories/create', methods=['POST'], endpoint='create_category_post')
 @login_required
 @limiter.limit("20 per hour")
 def create_category():
@@ -1557,7 +1557,7 @@ def create_category():
         return redirect(url_for('categories'))
 
 # Edit Category
-@app.route('/categories/<int:category_id>/edit', methods=['POST'])
+@app.route('/categories/<int:category_id>/edit', methods=['POST'], endpoint='edit_category_post')
 @login_required
 @limiter.limit("30 per hour")
 def edit_category(category_id):
@@ -1600,7 +1600,7 @@ def edit_category(category_id):
         return redirect(url_for('categories'))
 
 # Delete Category
-@app.route('/categories/<int:category_id>/delete', methods=['POST'])
+@app.route('/categories/<int:category_id>/delete', methods=['POST'], endpoint='delete_category_post')
 @login_required
 @limiter.limit("10 per hour")
 def delete_category(category_id):
@@ -1630,7 +1630,7 @@ def delete_category(category_id):
         return redirect(url_for('categories'))
 
 # View Entries by Category
-@app.route('/categories/<int:category_id>')
+@app.route('/categories/<int:category_id>', endpoint='view_category_entries_get')
 @login_required
 def view_category_entries(category_id):
     """View all entries in a specific category"""
