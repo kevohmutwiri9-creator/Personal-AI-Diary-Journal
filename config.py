@@ -43,6 +43,18 @@ class Config:
     MIN_ENTRY_LENGTH = 10
     MAX_ENTRY_LENGTH = 10000
     MAX_TITLE_LENGTH = 200
+    
+    # Email Configuration
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+    
+    # Password Reset
+    RESET_PASSWORD_TOKEN_EXPIRATION = 3600  # 1 hour in seconds
 
 
 class DevelopmentConfig(Config):

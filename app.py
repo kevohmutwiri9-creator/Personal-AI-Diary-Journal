@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_mail import Mail
 from datetime import datetime, timezone, timedelta
 import os
 import json
@@ -37,6 +38,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24).hex()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///diary.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Email configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 # Configure logging
 if not app.debug:
@@ -163,6 +173,7 @@ login_manager.login_view = 'login'
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
@@ -170,9 +181,52 @@ class User(db.Model, UserMixin):
     longest_streak = db.Column(db.Integer, default=0)
     streak_start_date = db.Column(db.DateTime, nullable=True)
     last_entry_date = db.Column(db.DateTime, nullable=True)
+    email_verified = db.Column(db.Boolean, default=False)
+    reset_token = db.Column(db.String(100), nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
     
     # Relationships
     entries = db.relationship('DiaryEntry', backref='author', lazy=True, cascade='all, delete-orphan')
+    
+    def get_reset_token(self, expires_sec=3600):
+        """Generate a password reset token for the user.
+        
+        Args:
+            expires_sec: Token expiration time in seconds (default: 1 hour)
+            
+        Returns:
+            str: The generated token
+        """
+        from itsdangerous import URLSafeTimedSerializer
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        self.reset_token = s.dumps(self.email, salt='password-reset-salt')
+        self.reset_token_expires = datetime.now(timezone.utc) + timedelta(seconds=expires_sec)
+        db.session.commit()
+        return self.reset_token
+    
+    @staticmethod
+    def verify_reset_token(token, max_age=3600):
+        """Verify a password reset token and return the user if valid.
+        
+        Args:
+            token: The token to verify
+            max_age: Maximum age of the token in seconds (default: 1 hour)
+            
+        Returns:
+            User: The user if token is valid, None otherwise
+        """
+        from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        
+        try:
+            email = s.loads(token, salt='password-reset-salt', max_age=max_age)
+        except (SignatureExpired, BadSignature):
+            return None
+            
+        user = User.query.filter_by(email=email, reset_token=token).first()
+        if user and user.reset_token_expires and user.reset_token_expires > datetime.now(timezone.utc):
+            return user
+        return None
 
     def update_streak(self):
         """Update user's writing streak"""
@@ -438,6 +492,80 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Handle password reset requests."""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Generate and send password reset email
+            token = user.get_reset_token()
+            
+            # Create reset link
+            reset_url = url_for('reset_password', token=token, _external=True)
+            
+            # Send email (in production, you would use a proper email service)
+            try:
+                msg = Message('Password Reset Request',
+                            sender=app.config['MAIL_DEFAULT_SENDER'],
+                            recipients=[user.email])
+                msg.body = f'''To reset your password, visit the following link:
+{reset_url}
+
+If you did not make this request, simply ignore this email and no changes will be made.
+'''
+                mail.send(msg)
+                flash('An email has been sent with instructions to reset your password.', 'info')
+            except Exception as e:
+                app.logger.error(f'Error sending password reset email: {str(e)}')
+                flash('An error occurred while sending the password reset email. Please try again later.', 'danger')
+        else:
+            # For security, don't reveal if the email exists or not
+            flash('If an account exists with that email, a password reset link has been sent.', 'info')
+        
+        return redirect(url_for('login'))
+        
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Handle password reset form."""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+        
+    user = User.verify_reset_token(token)
+    if not user:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('forgot_password'))
+        
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('reset_password', token=token))
+            
+        if not validate_password(password):
+            flash('Password must be at least 8 characters long and include at least one letter and one number', 'danger')
+            return redirect(url_for('reset_password', token=token))
+            
+        # Update password
+        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        user.reset_token = None
+        user.reset_token_expires = None
+        db.session.commit()
+        
+        flash('Your password has been updated! You can now log in.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('reset_password.html', token=token)
 
 # AdSense Verification Route
 @app.route('/googleytR3N45PwqlIrLfAySGxBq54hgHbj6GCP2Hp_SgoK6w.html')

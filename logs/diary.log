@@ -1,0 +1,655 @@
+2025-10-18 12:24:30,476 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:24:32,626 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:25:02,628 INFO: Login page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:25:23,349 INFO: Login page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:25:23,351 INFO: Login attempt for username: kevoh2 [in C:\Users\kevoh\Documents\My diary\app.py:472]
+2025-10-18 12:25:23,437 ERROR: Exception on /login [POST] [in C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: user.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask_limiter\extension.py", line 1299, in __inner
+    return cast(R, flask.current_app.ensure_sync(obj)(*a, **k))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kevoh\Documents\My diary\app.py", line 474, in login
+    user = User.query.filter_by(username=username).first()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2754, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user.email
+[SQL: SELECT user.id AS user_id, user.username AS user_username, user.email AS user_email, user.password AS user_password, user.created_at AS user_created_at, user.last_login AS user_last_login, user.current_streak AS user_current_streak, user.longest_streak AS user_longest_streak, user.streak_start_date AS user_streak_start_date, user.last_entry_date AS user_last_entry_date, user.email_verified AS user_email_verified, user.reset_token AS user_reset_token, user.reset_token_expires AS user_reset_token_expires 
+FROM user 
+WHERE user.username = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('kevoh2', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-18 12:25:27,401 INFO: Login page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:25:29,819 INFO: Register page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:25:54,321 INFO: Register page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:25:54,324 INFO: Registration attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:410]
+2025-10-18 12:25:54,329 ERROR: Exception on /register [POST] [in C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: user.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask_limiter\extension.py", line 1299, in __inner
+    return cast(R, flask.current_app.ensure_sync(obj)(*a, **k))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kevoh\Documents\My diary\app.py", line 427, in register
+    if User.query.filter_by(username=username).first():
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2754, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user.email
+[SQL: SELECT user.id AS user_id, user.username AS user_username, user.email AS user_email, user.password AS user_password, user.created_at AS user_created_at, user.last_login AS user_last_login, user.current_streak AS user_current_streak, user.longest_streak AS user_longest_streak, user.streak_start_date AS user_streak_start_date, user.last_entry_date AS user_last_entry_date, user.email_verified AS user_email_verified, user.reset_token AS user_reset_token, user.reset_token_expires AS user_reset_token_expires 
+FROM user 
+WHERE user.username = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('kevoh2071', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-18 12:26:39,176 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:26:41,515 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:26:50,817 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:26:54,058 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:27:11,337 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:27:14,156 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:27:29,672 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:27:33,810 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:30:09,691 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:30:14,916 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:31:15,013 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:31:18,728 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:31:52,714 INFO: Register page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:31:52,717 INFO: Registration attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:410]
+2025-10-18 12:31:52,720 ERROR: Exception on /register [POST] [in C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: user.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask_limiter\extension.py", line 1299, in __inner
+    return cast(R, flask.current_app.ensure_sync(obj)(*a, **k))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kevoh\Documents\My diary\app.py", line 427, in register
+    if User.query.filter_by(username=username).first():
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2754, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user.email
+[SQL: SELECT user.id AS user_id, user.username AS user_username, user.email AS user_email, user.password AS user_password, user.created_at AS user_created_at, user.last_login AS user_last_login, user.current_streak AS user_current_streak, user.longest_streak AS user_longest_streak, user.streak_start_date AS user_streak_start_date, user.last_entry_date AS user_last_entry_date, user.email_verified AS user_email_verified, user.reset_token AS user_reset_token, user.reset_token_expires AS user_reset_token_expires 
+FROM user 
+WHERE user.username = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('kevoh2071', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-18 12:31:58,697 INFO: Register page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:31:58,699 INFO: Registration attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:410]
+2025-10-18 12:31:58,702 ERROR: Exception on /register [POST] [in C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: user.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask_limiter\extension.py", line 1299, in __inner
+    return cast(R, flask.current_app.ensure_sync(obj)(*a, **k))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kevoh\Documents\My diary\app.py", line 427, in register
+    if User.query.filter_by(username=username).first():
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2754, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user.email
+[SQL: SELECT user.id AS user_id, user.username AS user_username, user.email AS user_email, user.password AS user_password, user.created_at AS user_created_at, user.last_login AS user_last_login, user.current_streak AS user_current_streak, user.longest_streak AS user_longest_streak, user.streak_start_date AS user_streak_start_date, user.last_entry_date AS user_last_entry_date, user.email_verified AS user_email_verified, user.reset_token AS user_reset_token, user.reset_token_expires AS user_reset_token_expires 
+FROM user 
+WHERE user.username = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('kevoh2071', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-18 12:32:02,716 INFO: Register page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:32:20,998 INFO: Register page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:32:21,002 INFO: Registration attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:410]
+2025-10-18 12:32:21,021 ERROR: Exception on /register [POST] [in C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: user.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\flask_limiter\extension.py", line 1299, in __inner
+    return cast(R, flask.current_app.ensure_sync(obj)(*a, **k))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\kevoh\Documents\My diary\app.py", line 427, in register
+    if User.query.filter_by(username=username).first():
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2754, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kevoh\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user.email
+[SQL: SELECT user.id AS user_id, user.username AS user_username, user.email AS user_email, user.password AS user_password, user.created_at AS user_created_at, user.last_login AS user_last_login, user.current_streak AS user_current_streak, user.longest_streak AS user_longest_streak, user.streak_start_date AS user_streak_start_date, user.last_entry_date AS user_last_entry_date, user.email_verified AS user_email_verified, user.reset_token AS user_reset_token, user.reset_token_expires AS user_reset_token_expires 
+FROM user 
+WHERE user.username = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('kevoh2071', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-18 12:36:19,896 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:36:22,709 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:37:18,809 INFO: Register page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:37:36,268 INFO: Register page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:404]
+2025-10-18 12:37:36,270 INFO: Registration attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:410]
+2025-10-18 12:37:37,391 INFO: User registered successfully: kevoh2071 (ID: 1) [in C:\Users\kevoh\Documents\My diary\app.py:454]
+2025-10-18 12:37:37,411 INFO: Login page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:37:51,820 INFO: Login page accessed - Method: POST [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:37:51,835 INFO: Login attempt for username: kevoh2071 [in C:\Users\kevoh\Documents\My diary\app.py:472]
+2025-10-18 12:37:52,559 INFO: User logged in successfully: kevoh2071 (ID: 1) [in C:\Users\kevoh\Documents\My diary\app.py:480]
+2025-10-18 12:38:51,495 INFO: Login page accessed - Method: GET [in C:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:41:45,759 INFO: Diary application startup [in c:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:41:48,809 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in c:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:41:56,137 INFO: Login page accessed - Method: GET [in c:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:46:52,217 INFO: Diary application startup [in c:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 12:46:56,901 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in c:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 12:47:06,682 INFO: Login page accessed - Method: GET [in c:\Users\kevoh\Documents\My diary\app.py:468]
+2025-10-18 12:47:28,777 INFO: Login page accessed - Method: GET [in c:\Users\kevoh\Documents\My diary\app.py:468]

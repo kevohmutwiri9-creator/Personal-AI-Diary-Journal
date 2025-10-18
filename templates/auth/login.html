@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Login - My Personal Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Sign In</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}" class="needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="invalid-feedback">
+                                Please enter your username.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter your password.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Sign In</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none">
+                                Forgot your password?
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    Don't have an account? 
+                    <a href="{{ url_for('auth.register') }}" class="text-decoration-none">
+                        Sign up
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Enable form validation
+(function () {
+    'use strict'
+    
+    // Fetch all forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+    
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle icon
+            const icon = this.querySelector('i');
+            icon.classList.toggle('bi-eye');
+            icon.classList.toggle('bi-eye-slash');
+        });
+    });
+})()
+</script>
+{% endblock %}
+
+<style>
+.toggle-password {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem 1rem;
+}
+
+.btn-primary {
+    padding: 0.5rem 1.5rem;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+</style>
+{% endblock %}
