@@ -1493,7 +1493,7 @@ def export_entries():
         return response
 
 # Categories Management
-@app.route('/categories')
+@app.route('/categories', endpoint='categories_list')
 @login_required
 def categories():
     """Display and manage user categories"""
