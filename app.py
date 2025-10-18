@@ -184,6 +184,7 @@ class User(db.Model, UserMixin):
     email_verified = db.Column(db.Boolean, default=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expires = db.Column(db.DateTime, nullable=True)
+    theme_preference = db.Column(db.String(10), default='light')  # 'light', 'dark', or 'system'
     
     # Relationships
     entries = db.relationship('DiaryEntry', backref='author', lazy=True, cascade='all, delete-orphan')
@@ -533,8 +534,29 @@ If you did not make this request, simply ignore this email and no changes will b
         
     return render_template('forgot_password.html')
 
-@app.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
+@app.route('/api/theme', methods=['POST'])
+@login_required
+@csrf.exempt  # Exempt CSRF for API endpoint with proper token validation
+def save_theme():
+    """Save user's theme preference"""
+    try:
+        data = request.get_json()
+        if not data or 'theme' not in data:
+            return jsonify({'error': 'Theme preference required'}), 400
+
+        theme = data['theme']
+        if theme not in ['light', 'dark', 'system']:
+            return jsonify({'error': 'Invalid theme'}), 400
+
+        # Update user's theme preference
+        current_user.theme_preference = theme
+        db.session.commit()
+
+        return jsonify({'success': True, 'theme': theme})
+
+    except Exception as e:
+        app.logger.error(f'Error saving theme preference for user {current_user.username}: {str(e)}')
+        return jsonify({'error': 'Failed to save theme preference'}), 500
     """Handle password reset form."""
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
@@ -676,12 +698,16 @@ def write():
     # Get user's categories for the form
     categories = Category.query.filter_by(user_id=current_user.id).all()
     
+    # Get user's templates for the form
+    user_templates = EntryTemplate.query.filter_by(user_id=current_user.id).all()
+    
     # Check if using a template
     template_content = request.args.get('template_content', '')
     template_title = request.args.get('template_title', '')
     
     return render_template('write.html', 
                          categories=categories,
+                         user_templates=user_templates,
                          template_content=template_content,
                          template_title=template_title)
 

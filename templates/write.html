@@ -72,15 +72,16 @@
         </div>
         
         <div class="form-group">
-            <label for="location" class="form-label">Location (Optional)</label>
-            <input 
-                type="text" 
-                id="location" 
-                name="location" 
-                class="form-input" 
-                placeholder="Where are you writing from?"
-                maxlength="100"
-            >
+            <label for="template_id" class="form-label">Use Template (Optional)</label>
+            <select id="template_id" name="template_id" class="form-input" onchange="loadTemplate()">
+                <option value="">Select a template to get started...</option>
+                {% for template in user_templates %}
+                    <option value="{{ template.id }}" data-content="{{ template.content | tojson | safe }}" data-title="{{ template.name | tojson | safe }}">
+                        {{ template.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <small class="form-help">Choose a saved template to help you start writing</small>
         </div>
         
         <div class="form-group">
@@ -533,6 +534,61 @@
 
     function closePreview() {
         document.getElementById('previewModal').style.display = 'none';
+    }
+
+    // Load template content when template is selected
+    function loadTemplate() {
+        const templateSelect = document.getElementById('template_id');
+        const selectedOption = templateSelect.options[templateSelect.selectedIndex];
+
+        if (selectedOption.value) {
+            const templateContent = selectedOption.getAttribute('data-content');
+            const templateTitle = selectedOption.getAttribute('data-title');
+
+            if (templateContent) {
+                // Parse the JSON-encoded content
+                const content = JSON.parse(templateContent);
+                document.getElementById('content-editor').innerHTML = content;
+
+                // Update title if template has one
+                if (templateTitle && templateTitle !== '""') {
+                    document.getElementById('title').value = JSON.parse(templateTitle);
+                }
+
+                // Update character and word counts
+                updateCounts();
+
+                // Show confirmation
+                if (!document.getElementById('templateLoadedMessage')) {
+                    const message = document.createElement('div');
+                    message.id = 'templateLoadedMessage';
+                    message.className = 'template-loaded-message';
+                    message.innerHTML = '<i class="fas fa-check-circle"></i> Template loaded! You can edit it as needed.';
+                    message.style.cssText = `
+                        background: rgba(39, 174, 96, 0.1);
+                        color: #27ae60;
+                        padding: 10px 15px;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        border: 1px solid rgba(39, 174, 96, 0.2);
+                        font-size: 0.9rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    `;
+
+                    const form = document.querySelector('.entry-form');
+                    form.insertBefore(message, form.firstChild);
+
+                    // Auto-remove after 3 seconds
+                    setTimeout(() => {
+                        if (message.parentNode) {
+                            message.remove();
+                        }
+                    }, 3000);
+                }
+            }
+        }
     }
 </script>
 {% endblock %}

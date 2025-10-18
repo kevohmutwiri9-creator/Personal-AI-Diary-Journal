@@ -1,0 +1,18 @@
+﻿feat: Implement complete password reset functionality
+
+- Add email fields to User model (email, email_verified, reset_token, reset_token_expires)
+- Create forgot password and reset password routes with secure token generation
+- Add Flask-Mail integration for sending password reset emails via Gmail SMTP
+- Create responsive HTML email templates for password reset notifications
+- Add CSRF protection to password reset forms
+- Implement secure token expiration (1 hour) and validation
+- Add password strength validation for reset form
+- Create database fix script for schema updates
+- Update login page with forgot password link
+
+Features:
+- Secure password reset via email
+- Token-based authentication with expiration
+- Professional email templates
+- Form validation and CSRF protection
+- Gmail SMTP integration

@@ -6,6 +6,13 @@
     <meta name="google-site-verification" content="ytR3N45PwqlIrLfAySGxBq54hgHbj6GCP2Hp_SgoK6w">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Theme Preference for JavaScript -->
+    {% if current_user.is_authenticated and current_user.theme_preference %}
+    <script>
+        window.userThemePreference = '{{ current_user.theme_preference }}';
+    </script>
+    {% endif %}
+
     <!-- PWA Support -->
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1093,30 +1100,109 @@
     </div>
 
     <script>
+        // Enhanced Theme Toggle with System Detection and User Sync
         function toggleTheme() {
             const body = document.body;
             const icon = document.querySelector('.theme-toggle i');
 
+            // Toggle theme
             body.classList.toggle('dark-mode');
 
+            // Update icon and save preference
             if (body.classList.contains('dark-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
                 localStorage.setItem('theme', 'dark');
+                saveUserThemePreference('dark');
             } else {
                 icon.classList.replace('fa-sun', 'fa-moon');
                 localStorage.setItem('theme', 'light');
+                saveUserThemePreference('light');
             }
+        }
+
+        // Save theme preference to server (for logged-in users)
+        async function saveUserThemePreference(theme) {
+            // Check if user is authenticated by looking for CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                try {
+                    const response = await fetch('/api/theme', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken.getAttribute('content')
+                        },
+                        body: JSON.stringify({ theme: theme })
+                    });
+
+                    if (!response.ok) {
+                        console.warn('Could not save theme preference to server');
+                    }
+                } catch (error) {
+                    console.warn('Error saving theme preference:', error);
+                }
+            }
+        }
+
+        // Enhanced theme initialization with system preference detection
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const icon = document.querySelector('.theme-toggle i');
+            const isAuthenticated = document.querySelector('meta[name="csrf-token"]') !== null;
+
+            // Priority: saved theme > system preference > light (default)
+            let theme = 'light';
+
+            if (isAuthenticated && window.userThemePreference) {
+                // Use user's saved preference if logged in
+                theme = window.userThemePreference;
+            } else if (savedTheme) {
+                // Use localStorage if available
+                theme = savedTheme;
+            } else if (systemPrefersDark) {
+                // Use system preference as fallback
+                theme = 'dark';
+            }
+
+            // Apply theme
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) {
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                }
+            } else if (icon) {
+                icon.classList.add('fa-moon');
+            }
+
+            // Save initial theme if not already saved
+            if (!savedTheme) {
+                localStorage.setItem('theme', theme);
+                if (theme !== 'light') {
+                    saveUserThemePreference(theme);
+                }
+            }
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                // Only auto-switch if user hasn't set a preference and isn't using system theme
+                if (!localStorage.getItem('theme') || localStorage.getItem('theme') === 'system') {
+                    if (e.matches) {
+                        document.body.classList.add('dark-mode');
+                        if (icon) icon.classList.replace('fa-moon', 'fa-sun');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        if (icon) icon.classList.replace('fa-sun', 'fa-moon');
+                        localStorage.setItem('theme', 'light');
+                    }
+                }
+            });
         }
 
         // Load saved theme and initialize accessibility
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            const icon = document.querySelector('.theme-toggle i');
-
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                icon.classList.replace('fa-moon', 'fa-sun');
-            }
+            initializeTheme();
 
             // Auto-hide flash messages
             const flashMessages = document.querySelectorAll('.flash-message');
