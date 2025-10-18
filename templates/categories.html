@@ -49,21 +49,18 @@
         {% if categories %}
             <div class="categories-grid">
                 {% for category in categories %}
-                    <div class="category-card" style="border-left: 4px solid {{ category.color }};">
-                        <div class="category-header">
-                            <h3 style="color: {{ category.color }};">{{ category.name }}</h3>
-                            <span class="category-count">{{ category.entries|length }} entries</span>
+                    <a href="{{ url_for('view_category_entries', category_id=category.id) }}" class="category-card-link">
+                        <div class="category-card" style="border-left: 4px solid {{ category.color }};">
+                            <div class="category-header">
+                                <h3 style="color: {{ category.color }};">{{ category.name }}</h3>
+                                <span class="category-count">{{ category.entry_count }} entries</span>
+                            </div>
+
+                            <div class="category-preview">
+                                <i class="fas fa-arrow-right"></i> View entries in this category
+                            </div>
                         </div>
-                        
-                        <div class="category-actions">
-                            <button class="btn btn-small" onclick="editCategory({{ category.id }}, '{{ category.name }}', '{{ category.color }}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="btn btn-small btn-danger" onclick="deleteCategory({{ category.id }}, '{{ category.name }}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
+                    </a>
                 {% endfor %}
             </div>
         {% else %}
@@ -205,9 +202,37 @@
         color: #bdc3c7;
     }
 
-    .category-actions {
+    .category-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .category-card-link:hover .category-card {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .category-preview {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        padding: 15px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 15px;
         display: flex;
-        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .dark-mode .category-preview {
+        color: #bdc3c7;
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .category-preview i {
+        color: #667eea;
     }
 
     .no-categories {
@@ -253,27 +278,59 @@
             gap: 10px;
             align-items: flex-start;
         }
-
-        .category-actions {
-            width: 100%;
-            justify-content: center;
-        }
     }
 </style>
 
 <script>
     function editCategory(id, name, color) {
         const newName = prompt('Enter new category name:', name);
+        const newColor = prompt('Enter new color (hex code):', color);
+
         if (newName && newName !== name) {
-            // TODO: Implement edit functionality
-            alert('Edit functionality coming soon!');
+            // Send edit request
+            fetch(`/categories/${id}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `name=${encodeURIComponent(newName)}&color=${encodeURIComponent(newColor || color)}&csrf_token=${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to update category');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
         }
     }
 
     function deleteCategory(id, name) {
-        if (confirm(`Are you sure you want to delete the category "${name}"? This action cannot be undone.`)) {
-            // TODO: Implement delete functionality
-            alert('Delete functionality coming soon!');
+        if (confirm(`Are you sure you want to delete the category "${name}"? This will remove the category association from all entries but keep the entries themselves.`)) {
+            fetch(`/categories/${id}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `csrf_token=${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/categories';
+                } else {
+                    alert(data.message || 'Failed to delete category');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
         }
     }
 </script>

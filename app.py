@@ -1492,20 +1492,189 @@ def export_entries():
         response.headers['Content-Disposition'] = f'attachment; filename=diary_export_{datetime.now().strftime("%Y%m%d")}.txt'
         return response
 
+# Categories Management
+@app.route('/categories')
+@login_required
+def categories():
+    """Display and manage user categories"""
+    app.logger.info(f'Categories page accessed by {current_user.username}')
+
+    # Get user's categories with entry counts
+    categories = db.session.query(Category, db.func.count(DiaryEntry.id).label('entry_count'))\
+        .outerjoin(DiaryEntry, Category.id == DiaryEntry.category_id)\
+        .filter(Category.user_id == current_user.id)\
+        .group_by(Category.id)\
+        .order_by(Category.name)\
+        .all()
+
+    # Convert to Category objects with entry counts
+    categories_with_counts = []
+    for category, count in categories:
+        category.entry_count = count
+        categories_with_counts.append(category)
+
+    return render_template('categories.html', categories=categories_with_counts)
+
+# Create Category
+@app.route('/categories/create', methods=['POST'])
+@login_required
+@limiter.limit("20 per hour")
+def create_category():
+    """Create a new category"""
+    app.logger.info(f'Category creation requested by {current_user.username}')
+
+    try:
+        name = request.form.get('name', '').strip()
+        color = request.form.get('color', '#667eea')
+
+        if not name:
+            flash('Category name is required', 'danger')
+            return redirect(url_for('categories'))
+
+        if len(name) > 50:
+            flash('Category name must be 50 characters or less', 'danger')
+            return redirect(url_for('categories'))
+
+        # Check if category name already exists for this user
+        existing_category = Category.query.filter_by(name=name, user_id=current_user.id).first()
+        if existing_category:
+            flash('A category with this name already exists', 'danger')
+            return redirect(url_for('categories'))
+
+        # Create new category
+        category = Category(name=name, color=color, user_id=current_user.id)
+        db.session.add(category)
+        db.session.commit()
+
+        app.logger.info(f'Category created: {name} by {current_user.username}')
+        flash(f'Category "{name}" created successfully!', 'success')
+        return redirect(url_for('categories'))
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f'Error creating category for {current_user.username}: {str(e)}')
+        flash('An error occurred while creating the category. Please try again.', 'danger')
+        return redirect(url_for('categories'))
+
+# Edit Category
+@app.route('/categories/<int:category_id>/edit', methods=['POST'])
+@login_required
+@limiter.limit("30 per hour")
+def edit_category(category_id):
+    """Edit an existing category"""
+    category = Category.query.filter_by(id=category_id, user_id=current_user.id).first_or_404()
+
+    try:
+        name = request.form.get('name', '').strip()
+        color = request.form.get('color', '#667eea')
+
+        if not name:
+            flash('Category name is required', 'danger')
+            return redirect(url_for('categories'))
+
+        if len(name) > 50:
+            flash('Category name must be 50 characters or less', 'danger')
+            return redirect(url_for('categories'))
+
+        # Check if new name conflicts with existing categories (excluding current)
+        existing_category = Category.query.filter_by(name=name, user_id=current_user.id)\
+            .filter(Category.id != category_id).first()
+        if existing_category:
+            flash('A category with this name already exists', 'danger')
+            return redirect(url_for('categories'))
+
+        # Update category
+        old_name = category.name
+        category.name = name
+        category.color = color
+        db.session.commit()
+
+        app.logger.info(f'Category updated: {old_name} -> {name} by {current_user.username}')
+        flash(f'Category "{name}" updated successfully!', 'success')
+        return redirect(url_for('categories'))
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f'Error updating category {category_id} for {current_user.username}: {str(e)}')
+        flash('An error occurred while updating the category. Please try again.', 'danger')
+        return redirect(url_for('categories'))
+
+# Delete Category
+@app.route('/categories/<int:category_id>/delete', methods=['POST'])
+@login_required
+@limiter.limit("10 per hour")
+def delete_category(category_id):
+    """Delete a category and unassign it from entries"""
+    category = Category.query.filter_by(id=category_id, user_id=current_user.id).first_or_404()
+
+    try:
+        # Get entries in this category to update them
+        entries_in_category = DiaryEntry.query.filter_by(category_id=category_id, user_id=current_user.id).all()
+
+        # Remove category association from entries (set to None)
+        for entry in entries_in_category:
+            entry.category_id = None
+
+        # Delete the category
+        db.session.delete(category)
+        db.session.commit()
+
+        app.logger.info(f'Category deleted: {category.name} by {current_user.username}')
+        flash(f'Category "{category.name}" deleted successfully!', 'success')
+        return redirect(url_for('categories'))
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f'Error deleting category {category_id} for {current_user.username}: {str(e)}')
+        flash('An error occurred while deleting the category. Please try again.', 'danger')
+        return redirect(url_for('categories'))
+
+# View Entries by Category
+@app.route('/categories/<int:category_id>')
+@login_required
+def view_category_entries(category_id):
+    """View all entries in a specific category"""
+    category = Category.query.filter_by(id=category_id, user_id=current_user.id).first_or_404()
+
+    # Get entries in this category
+    entries = DiaryEntry.query.filter_by(category_id=category_id, user_id=current_user.id)\
+        .order_by(DiaryEntry.timestamp.desc()).all()
+
+    return render_template('category_entries.html',
+                         category=category,
+                         entries=entries)
+
+# API endpoint to get category entries count
+@app.route('/api/categories/<int:category_id>/entries')
+@login_required
+def get_category_entries_count(category_id):
+    """Get the number of entries in a category (AJAX endpoint)"""
+    category = Category.query.filter_by(id=category_id, user_id=current_user.id).first()
+
+    if not category:
+        return jsonify({'error': 'Category not found'}), 404
+
+    count = DiaryEntry.query.filter_by(category_id=category_id, user_id=current_user.id).count()
+
+    return jsonify({
+        'category_id': category_id,
+        'entry_count': count
+    })
+
 # Toggle Favorite/Pin Entry
 @app.route('/toggle_favorite/<int:entry_id>', methods=['POST'])
 @login_required
 @limiter.limit("50 per hour")
 def toggle_favorite(entry_id):
     entry = DiaryEntry.query.filter_by(id=entry_id, user_id=current_user.id).first_or_404()
-    
+
     try:
         entry.is_favorite = not entry.is_favorite
         db.session.commit()
-        
+
         status = 'pinned' if entry.is_favorite else 'unpinned'
         app.logger.info(f'Entry {entry_id} {status} by {current_user.username}')
-        
+
         return jsonify({
             'success': True,
             'is_favorite': entry.is_favorite,

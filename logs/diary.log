@@ -915,3 +915,5 @@ WHERE user.username = ?
 2025-10-18 17:00:49,944 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
 2025-10-18 17:01:00,600 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
 2025-10-18 17:01:08,403 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
+2025-10-18 18:05:31,986 INFO: Diary application startup [in C:\Users\kevoh\Documents\My diary\app.py:74]
+2025-10-18 18:05:37,823 INFO: Gemini AI initialized successfully using model: models/gemini-2.5-flash-preview-05-20 [in C:\Users\kevoh\Documents\My diary\app.py:131]
